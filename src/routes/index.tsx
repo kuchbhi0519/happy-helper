@@ -8,150 +8,138 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const pad = (n: number, len = 2) => String(n).padStart(len, "0");
+const CREAM = "#F5F5DC";
 
-function AnalogClock({ date }: { date: Date }) {
-  const h = date.getHours();
-  const m = date.getMinutes();
-  const s = date.getSeconds();
+const GALLERY_TITLES = [
+  "Look 01",
+  "Look 02",
+  "Look 03",
+  "Look 04",
+  "Look 05",
+  "Look 06",
+  "Look 07",
+];
 
-  const hourDeg = ((h % 12) / 12) * 360 + (m / 60) * 30;
-  const minDeg = (m / 60) * 360 + (s / 60) * 6;
-  const secDeg = (s / 60) * 360;
+// Placeholder tones for the gallery tiles until real photography is swapped in.
+const TILE_COLORS = [
+  "linear-gradient(160deg,#8aa0b6 0%,#5d7893 60%,#3e5670 100%)",
+  "linear-gradient(160deg,#efeae0 0%,#ded5c4 55%,#bdb096 100%)",
+  "linear-gradient(160deg,#f2f2ef 0%,#d9d8d2 55%,#8f8e86 100%)",
+  "linear-gradient(160deg,#9a9a94 0%,#6b6b64 55%,#3c3c37 100%)",
+  "linear-gradient(160deg,#b3584f 0%,#8c443d 55%,#5e2e29 100%)",
+  "linear-gradient(160deg,#394356 0%,#283243 55%,#1b2331 100%)",
+  "radial-gradient(circle at 50% 40%,#3a3a44 0%,#141417 70%), linear-gradient(#141417,#141417)",
+];
 
-  const faceSize = 220;
-  const center = faceSize / 2;
-
+function CornerBrackets() {
+  const bracket = "pointer-events-none absolute w-8 h-8 sm:w-12 sm:h-12 border-[CREAM]";
   return (
-    <div
-      className="rounded-full border-[6px] border-white bg-white shadow-xl ring-1 ring-black/5"
-      style={{ width: faceSize, height: faceSize, position: "relative" }}
-    >
-      {/* Tick marks */}
-      {Array.from({ length: 60 }).map((_, i) => (
-        <span
-          key={i}
-          className="absolute inset-0"
-          style={{ transform: `rotate(${i * 6}deg)` }}
-        >
-          <span
-            className="absolute rounded-full"
-            style={{
-              left: center - (i % 5 === 0 ? 2 : 1),
-              top: 8,
-              width: i % 5 === 0 ? 4 : 2,
-              height: i % 5 === 0 ? 12 : 6,
-              backgroundColor: i % 5 === 0 ? "#40403d" : "#c8c4bd",
-            }}
-          />
-        </span>
-      ))}
-
-      {/* Numbers */}
-      {[12, 3, 6, 9].map((num, idx) => {
-        const deg = [0, 90, 180, 270][idx];
-        const rad = (deg * Math.PI) / 180;
-        const x = center + Math.sin(rad) * (faceSize / 2 - 28);
-        const y = center - Math.cos(rad) * (faceSize / 2 - 28);
-        return (
-          <span
-            key={num}
-            className="absolute font-semibold leading-none text-neutral-800"
-            style={{
-              fontSize: 18,
-              left: x,
-              top: y,
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            {num}
-          </span>
-        );
-      })}
-
-      {/* Hands */}
-      <Hand size={faceSize} length={52} width={6} rotation={hourDeg} color="#40403d" />
-      <Hand size={faceSize} length={72} width={4} rotation={minDeg} color="#40403d" />
-      <Hand
-        size={faceSize}
-        length={84}
-        width={2}
-        rotation={secDeg}
-        color="#dc2626"
-      />
-
-      {/* Center pin */}
-      <span className="absolute rounded-full bg-red-600 ring-2 ring-white" style={{ left: center - 5, top: center - 5, width: 10, height: 10 }} />
-    </div>
+    <>
+      <div className={`${bracket} left-4 top-4 border-l border-t`} style={{ borderColor: CREAM }} />
+      <div className={`${bracket} right-4 top-4 border-r border-t`} style={{ borderColor: CREAM }} />
+      <div className={`${bracket} bottom-4 left-4 border-b border-l`} style={{ borderColor: CREAM }} />
+      <div className={`${bracket} bottom-4 right-4 border-b border-r`} style={{ borderColor: CREAM }} />
+    </>
   );
 }
 
-function Hand({
-  size,
-  length,
-  width,
-  rotation,
-  color,
-}: {
-  size: number;
-  length: number;
-  width: number;
-  rotation: number;
-  color: string;
-}) {
-  const center = size / 2;
-  return (
-    <span
-      className="absolute rounded-full"
-      style={{
-        left: center - width / 2,
-        top: center - length,
-        width: width,
-        height: length,
-        backgroundColor: color,
-        transformOrigin: `${width / 2}px ${length}px`,
-        transform: `rotate(${rotation}deg)`,
-      }}
-    />
-  );
-}
-
-function DigitalClock({ date }: { date: Date }) {
-  const timeString = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-  return (
-    <div className="mt-8 flex flex-col items-center gap-1.5">
-      <div
-        className="tabular-nums font-light tracking-tight text-neutral-900"
-        style={{ fontSize: "clamp(3rem, 9vw, 5rem)", lineHeight: 1 }}
-      >
-        {timeString.slice(0, 5)}
-        <span className="text-neutral-400">{timeString.slice(5)}</span>
-      </div>
-      <div className="text-sm uppercase tracking-[0.25em] text-neutral-500">
-        {Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date)},{" "}
-        {Intl.DateTimeFormat("en-US", { month: "long", day: "numeric" }).format(date)}
-      </div>
-    </div>
-  );
-}
-
-function Index() {
-  const [now, setNow] = useState(() => new Date());
+function NewYorkTime() {
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    setNow(new Date());
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  const formatted = now
+    ? Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        hour: "numeric",
+        minute: "2-digit",
+        meridiem: "short",
+      }).format(now)
+    : "";
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center px-6"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <div className="flex flex-col items-center">
-        <AnalogClock date={now} />
-        <DigitalClock date={now} />
-      </div>
-    </div>
+    <span className="whitespace-nowrap text-xs uppercase tracking-[0.2em]" style={{ color: CREAM }}>
+      {formatted.replace(" ", "")}&nbsp;&middot;&nbsp;NYC
+    </span>
+  );
+}
+
+function Index() {
+  return (
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-black" style={{ color: CREAM }}>
+      <CornerBrackets />
+
+      {/* Header */}
+      <header className="flex shrink-0 items-center justify-center pt-8 pb-4">
+        <button
+          type="button"
+          className="cursor-pointer text-xs font-medium uppercase tracking-[0.35em] transition-opacity hover:opacity-60"
+          style={{ color: CREAM }}
+        >
+          Menu
+        </button>
+      </header>
+
+      {/* Hero typography */}
+      <section className="flex flex-col px-4 sm:px-10 md:px-16 lg:px-24">
+        <h1
+          className="font-serif-didone uppercase leading-[0.85] tracking-[-0.04em]"
+          style={{ fontSize: "clamp(4.5rem, 17vw, 15rem)" }}
+        >
+          <span className="block pl-0 text-left">Dondre</span>
+          <span className="block pr-0 text-right">Green</span>
+        </h1>
+      </section>
+
+      {/* Gallery */}
+      <section className="grid shrink-0 grid-cols-2 gap-x-2 gap-y-8 overflow-x-auto px-3 py-8 sm:grid-cols-4 md:gap-x-3 md:px-4 lg:grid-cols-7 lg:overflow-visible lg:px-5">
+        {TILE_COLORS.map((bg, i) => (
+          <figure
+            key={i}
+            className="group relative shrink-0 cursor-pointer"
+            style={{ aspectRatio: "3 / 4" }}
+          >
+            <div
+              className="absolute inset-0 opacity-70 saturate-[0.85] transition duration-500 ease-out group-hover:scale-[1.03] group-hover:opacity-100 group-hover:saturate-100"
+              style={{ backgroundImage: bg }}
+            />
+            <figcaption className="pointer-events-none absolute inset-0 flex items-end justify-start p-3 text-[11px] uppercase tracking-[0.2em] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              {GALLERY_TITLES[i]}
+            </figcaption>
+          </figure>
+        ))}
+      </section>
+
+      {/* Spacer */}
+      <div className="grow" />
+
+      {/* Footer */}
+      <footer className="mx-auto mb-10 grid w-full max-w-6xl grid-cols-3 items-end gap-4 px-8 sm:mb-12 sm:px-14">
+        <div className="justify-self-start">
+          <button
+            type="button"
+            className="cursor-pointer text-xs font-medium uppercase tracking-[0.3em] transition-opacity hover:opacity-60"
+            style={{ color: CREAM }}
+          >
+            Change Theme
+          </button>
+        </div>
+        <div
+          className="hidden justify-self-center text-sm italic uppercase tracking-[0.18em] sm:block"
+          style={{ fontFamily: "'Newsreader', Georgia, 'Times New Roman', serif", color: CREAM }}
+        >
+          ART DIRECTOR
+          <br />
+          PHOTOGRAPHER
+        </div>
+        <div className="self-end justify-self-end">
+          <NewYorkTime />
+        </div>
+      </footer>
+    </main>
   );
 }
